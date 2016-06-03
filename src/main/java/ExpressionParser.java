@@ -8,6 +8,7 @@ public class ExpressionParser {
     private final Set<String> FUNCTIONS =
             new HashSet<String>(Arrays.asList("sin", "cos", "pow", "log", "abs"));
 
+
     private List<String> postfix = new ArrayList<String>();
     private Stack<String> stack = new Stack<String>();
 
@@ -34,6 +35,12 @@ public class ExpressionParser {
         return priority;
     }
 
+    /**
+     * Метод для перевода входящей строки из инфиксной формы в постфиксную
+     * по алгоритму сортировочной станции
+     * @param infix строка в инфиксной форме
+     * @return Список строк с токенами в постфиксной форме
+     */
     public List<String> fromInfixToPostfix(String infix){
         String currentToken = "";
         StringTokenizer tokenizer = new StringTokenizer(prepareExpression(infix), NONOPERANDS, true);
@@ -41,10 +48,11 @@ public class ExpressionParser {
 
             currentToken = tokenizer.nextToken();
 
-            //check exponential number
+            //проверка на экспонциональную запись
             if(currentToken.contains("E")){
                 currentToken += tokenizer.nextToken() + tokenizer.nextToken();
             }
+
             if(isFunction(currentToken)){
                 stack.push(currentToken);
             } else if (isOperator(currentToken)){
@@ -52,6 +60,10 @@ public class ExpressionParser {
             } else if (isParentheses(currentToken)){
                 processingParentheses(currentToken);
             } else {
+                //проверяем что перед нами переменная
+                if(VariablesParser.isVariableExist(currentToken)){
+                   currentToken = VariablesParser.switchNameToValue(currentToken);
+                }
                 postfix.add(currentToken);
             }
         }
@@ -62,6 +74,8 @@ public class ExpressionParser {
         return postfix;
     }
 
+
+    //обраотка токенов в зависимости от их принадлежности
     private void processingParentheses(String token){
         if(token.equals("(")){
             stack.push(token);
@@ -76,7 +90,6 @@ public class ExpressionParser {
             postfix.add(stack.pop());
         }
     }
-
     private void processingOperators(String token){
         while (!stack.isEmpty() && (getPriority(token) <= getPriority(stack.peek()))) {
             postfix.add(stack.pop());
@@ -84,11 +97,13 @@ public class ExpressionParser {
         stack.push(token);
     }
 
+    //подготовка строки к парсингу
     private String prepareExpression(String expression){
         expression = expression.replace(" ", "");
         expression = expression.replace(",",".");
         expression = expression.replace("e", "E");
         return expression;
     }
+
 
 }

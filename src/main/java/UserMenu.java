@@ -1,8 +1,7 @@
-import com.sun.org.apache.xpath.internal.SourceTree;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Map;
 
 public class UserMenu {
 
@@ -14,7 +13,11 @@ public class UserMenu {
     public void showMenu() throws IOException {
         while (choose != 4){
             printMenu();
-            choose = Integer.parseInt(reader.readLine());
+            try {
+                choose = Integer.parseInt(reader.readLine());
+            } catch (Exception e){
+                System.out.println("Введите цифру из списка");
+            }
             switch (choose){
                 case 1:
                     menuItem1();
@@ -29,11 +32,19 @@ public class UserMenu {
                     break;
             }
         }
+        reader.close();
 
     }
 
     private void printMenu() {
         System.out.println("Выберите действие");
+        if(!VariablesParser.variablesMap.isEmpty()){
+            System.out.println("Введенные переменные: ");
+            for (Map.Entry<String, Double> stringDoubleEntry : VariablesParser.variablesMap.entrySet()) {
+                System.out.println(stringDoubleEntry.getKey() + " = " + stringDoubleEntry.getValue());
+            }
+            System.out.println("_____________________");
+        }
         System.out.println(
                   "1. Задать переменные." + "\n"
                 + "2. Ввести выражение." + "\n"
@@ -42,15 +53,16 @@ public class UserMenu {
         );
     }
 
-    private void menuItem1(){
-        System.out.println("entered vars");
+    private void menuItem1() throws IOException {
+        System.out.println("Введите переменную: ");
+        VariablesParser.parseVariable();
     }
 
     private void menuItem2() throws IOException {
-        System.out.println("Enter expression: ");
+        System.out.println("Введите выражение: ");
         String expression = reader.readLine();
         Double result = calculator.calculatePostfix(parser.fromInfixToPostfix(expression));
-        System.out.println("Result is: " + result);
+        System.out.println("Результат выражения: " + result);
     }
 
     private void menuItem3(){
