@@ -63,6 +63,7 @@ public class UserMenu {
         String expression = reader.readLine();
         Double result = calculator.calculatePostfix(parser.fromInfixToPostfix(expression));
         System.out.println("Результат выражения: " + result);
+        parser.clear();
     }
 
     private void menuItem3(){

@@ -2,7 +2,7 @@ import java.util.*;
 
 public class PostfixCalculator {
 
-    private final String OPERATORS = "+-*/";
+    private final String OPERATORS = "+u-*/";
     private final Set<String> FUNCTIONS =
             new HashSet<String>(Arrays.asList("sin", "cos", "pow", "log", "abs"));
     private Stack<Double> stack = new Stack<Double>();
@@ -15,7 +15,9 @@ public class PostfixCalculator {
                 calculateFunctions(token);
             } else stack.push(Double.valueOf(token));
         }
-        return stack.peek();
+        Double result = stack.peek();
+        stack.clear();
+        return result;
     }
 
     private void calculateFunctions(String token){
@@ -51,6 +53,9 @@ public class PostfixCalculator {
         if(token.equals("/")){
             double second = stack.pop(), first = stack.pop();
             stack.push(first / second);
+        }
+        if(token.equals("u-")){
+            stack.push(-stack.pop());
         }
     }
 
